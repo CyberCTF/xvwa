@@ -17,7 +17,7 @@ start.
 
 ```bash
 isoloom generate
-isoloom up docker
+isoloom run docker
 ```
 
 Then open http://localhost:8024/xvwa/ and log in as `admin` / `admin`. The database is already
