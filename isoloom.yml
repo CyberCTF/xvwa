@@ -1,0 +1,42 @@
+# yaml-language-server: $schema=https://www.isoloom.com/schema/v1.json
+# XVWA, Xtreme Vulnerable Web Application (by @s4n7h0 and @samanL33T) as an Isoloom
+# spec: the upstream PHP source, vendored unchanged in build/xvwa/app/, served by a PHP 5.6 /
+# Apache image we wrote (upstream has no Dockerfile), and a MariaDB machine. The image runs
+# XVWA's Setup page at first start. `isoloom generate`, then `isoloom up docker`.
+version: 1
+name: xvwa
+
+networks:
+  lab: { cidr: 10.60.24.0/24, internet: false }
+
+machines:
+  db:
+    networks: { lab: 20 }
+    services: [{ port: 3306, name: mariadb }]
+    resources: { cpus: 1, memory_mb: 512 }
+    volumes: { data: /var/lib/mysql }
+    docker:
+      build: build/db
+
+  xvwa:
+    networks: { lab: 10 }
+    services: [{ port: 80, name: web, http: true, publish: 8024 }]
+    resources: { cpus: 1, memory_mb: 512 }
+    depends_on: [db]
+    docker:
+      build: build/xvwa
+
+checks:
+  - name: XVWA answers
+    http: http://xvwa/xvwa/
+    wait: 180
+  - name: admin / admin logs in (the database is set up)
+    script: checks/login.sh
+    wait: 90
+  - name: the SQL injection module reads the products table
+    script: checks/sqli.sh
+
+message: |
+  XVWA answers at http://localhost:{{ machines.xvwa.services.0.publish }}/xvwa/. The database is
+  already set up: log in as admin / admin (or xvwa / xvwa, user / vulnerable), then pick a module
+  from the side panel. Setup / Reset puts the database back to its first state.
