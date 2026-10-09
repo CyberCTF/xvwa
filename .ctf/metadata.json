@@ -4,6 +4,5 @@
   "question": "Exploit each XVWA module, starting with SQL injection.",
   "category": "WEB",
   "difficulty": 2,
-  "evidence_kind": "SECRET",
-  "capabilities": ["sql-injection", "cross-site-scripting", "command-injection", "php-object-injection", "server-side-template-injection", "ssrf"]
+  "evidence_kind": "SECRET"
 }
