@@ -13,3 +13,4 @@ configMapGenerator:
     files:
       - checks__login.sh=../../checks/login.sh
       - checks__sqli.sh=../../checks/sqli.sh
+      - ctf__flag.sh=../../ctf/flag.sh

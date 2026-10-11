@@ -1,7 +1,7 @@
 {
   "title": "XVWA",
   "description": "Xtreme Vulnerable Web Application: a badly coded PHP/MySQL coffee shop with one module per web vulnerability, from SQL injection and XPath injection to PHP object injection, SSRF and server-side template injection.",
-  "question": "Exploit each XVWA module, starting with SQL injection.",
+  "question": "Use the SQL injection module to read the flag in the flags table of the shop's database.",
   "category": "WEB",
   "difficulty": 2,
   "evidence_kind": "SECRET"
