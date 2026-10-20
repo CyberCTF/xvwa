@@ -7,30 +7,39 @@ version: 1
 name: xvwa
 
 # Given by the CyberCTF launcher: this player's flag. Without it the development flag.
-inputs: [CTF_FLAG_MAIN]
+inputs:
+  CTF_FLAG_MAIN: {}
 
 networks:
-  lab: { cidr: 10.60.24.0/24, internet: false }
+  lab: {cidr: 10.60.24.0/24, internet: false}
 
 machines:
   db:
-    networks: { lab: 20 }
-    services: [{ port: 3306, name: mariadb }]
-    resources: { cpus: 1, memory_mb: 512 }
-    volumes: { data: /var/lib/mysql }
-    inputs: [CTF_FLAG_MAIN]
-    docker:
+    networks: {lab: 20}
+    resources: {cpus: 1, memory_mb: 512}
+    volumes: {data: /var/lib/mysql}
+    ports:
+      mariadb:
+        port: 3306
+    files:
+      - path: /run/lab/ctf_flag_main
+        input: CTF_FLAG_MAIN
+    setup:
+      - ctf/flag.sh
+    app:
       build: build/db
-      init: [ctf/flag.sh]
 
   xvwa:
-    networks: { lab: 10 }
-    services: [{ port: 80, name: web, http: true, publish: 8024 }]
-    resources: { cpus: 1, memory_mb: 512 }
+    networks: {lab: 10}
+    resources: {cpus: 1, memory_mb: 512}
     depends_on: [db]
-    docker:
+    ports:
+      web:
+        port: 80
+        protocol: http
+        publish: true
+    app:
       build: build/xvwa
-
 checks:
   - name: XVWA answers
     http: http://xvwa/xvwa/
@@ -42,6 +51,6 @@ checks:
     script: checks/sqli.sh
 
 message: |
-  XVWA answers at http://localhost:{{ machines.xvwa.services.0.publish }}/xvwa/. The database is
+  XVWA answers at {{ machines.xvwa.ports.web.url }}xvwa/. The database is
   already set up: log in as admin / admin (or xvwa / xvwa, user / vulnerable), then pick a module
   from the side panel. Setup / Reset puts the database back to its first state.
